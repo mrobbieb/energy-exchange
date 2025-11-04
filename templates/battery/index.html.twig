@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Battery index{% endblock %}
+
+{% block body %}
+    <h1>Battery index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>UserId</th>
+                <th>CreatedAt</th>
+                <th>BatteryBankId</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for battery in batteries %}
+            <tr>
+                <td>{{ battery.id }}</td>
+                <td>{{ battery.name }}</td>
+                <td>{{ battery.userId }}</td>
+                <td>{{ battery.createdAt ? battery.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ battery.batteryBankId }}</td>
+                <td>{{ battery.updatedAt ? battery.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_battery_show', {'id': battery.id}) }}">show</a>
+                    <a href="{{ path('app_battery_edit', {'id': battery.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_battery_new') }}">Create new</a>
+{% endblock %}

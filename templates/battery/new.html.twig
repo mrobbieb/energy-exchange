@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Battery{% endblock %}
+
+{% block body %}
+    <h1>Create new Battery</h1>
+
+    {{ include('battery/_form.html.twig') }}
+
+    <a href="{{ path('app_battery_index') }}">back to list</a>
+{% endblock %}

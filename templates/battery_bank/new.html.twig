@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New BatteryBank{% endblock %}
+
+{% block body %}
+    <h1>Create new BatteryBank</h1>
+
+    {{ include('battery_bank/_form.html.twig') }}
+
+    <a href="{{ path('app_battery_bank_index') }}">back to list</a>
+{% endblock %}

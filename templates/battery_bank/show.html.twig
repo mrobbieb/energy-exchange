@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BatteryBank{% endblock %}
+
+{% block body %}
+    <h1>BatteryBank</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ battery_bank.id }}</td>
+            </tr>
+            <tr>
+                <th>Uuid</th>
+                <td>{{ battery_bank.uuid }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ battery_bank.createdAt ? battery_bank.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ battery_bank.updatedAt ? battery_bank.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ battery_bank.description }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_battery_bank_index') }}">back to list</a>
+
+    <a href="{{ path('app_battery_bank_edit', {'id': battery_bank.id}) }}">edit</a>
+
+    {{ include('battery_bank/_delete_form.html.twig') }}
+{% endblock %}
