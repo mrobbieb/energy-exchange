@@ -32,6 +32,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    /**
+     * @var integer the total number of credits the user has available.
+     * Must be a positive, > 0 value
+     */
+    #[ORM\Column]
+    private ?int $credits = 0;
+
     public function getId(): ?int
     {
         return $this->id;
