@@ -12,7 +12,6 @@ class BatteryBankType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('uuid')
             ->add('createdAt', null, [
                 'widget' => 'single_text',
             ])

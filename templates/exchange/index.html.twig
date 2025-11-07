@@ -9,7 +9,6 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Uuid</th>
                 <th>UserId</th>
                 <th>BatteryId</th>
                 <th>CreatedAt</th>
@@ -22,7 +21,6 @@
         {% for exchange in exchanges %}
             <tr>
                 <td>{{ exchange.id }}</td>
-                <td>{{ exchange.uuid }}</td>
                 <td>{{ exchange.userId }}</td>
                 <td>{{ exchange.batteryId }}</td>
                 <td>{{ exchange.createdAt ? exchange.createdAt|date('Y-m-d H:i:s') : '' }}</td>

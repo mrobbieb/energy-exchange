@@ -2,18 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\ExchangeRepository;
-use Doctrine\DBAL\Types\Types;
+use App\Repository\PowerSourceRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
-/**
- * Exchange will be the source of truth for the User's total contribution
- *  to a specific BatteryBank.
- */
-#[ORM\Entity(repositoryClass: ExchangeRepository::class)]
+#[ORM\Entity(repositoryClass: PowerSourceRepository::class)]
 #[Broadcast]
-class Exchange
+class PowerSource
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -21,45 +16,22 @@ class Exchange
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $userId = null;
-
-    #[ORM\Column]
-    private ?int $batteryId = null;
-
-    #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column]
-    private ?int $watts = null;
+    #[ORM\OneToOne(inversedBy: 'powerSource', cascade: ['persist', 'remove'])]
+    private ?Battery $battery = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUserId(): ?int
+    public function setId(string $id): static
     {
-        return $this->userId;
-    }
-
-    public function setUserId(int $userId): static
-    {
-        $this->userId = $userId;
-
-        return $this;
-    }
-
-    public function getBatteryId(): ?int
-    {
-        return $this->batteryId;
-    }
-
-    public function setBatteryId(int $batteryId): static
-    {
-        $this->batteryId = $batteryId;
+        $this->id = $id;
 
         return $this;
     }
@@ -88,14 +60,14 @@ class Exchange
         return $this;
     }
 
-    public function getWatts(): ?int
+    public function getBattery(): ?Battery
     {
-        return $this->watts;
+        return $this->battery;
     }
 
-    public function setWatts(int $watts): static
+    public function setBattery(?Battery $battery): static
     {
-        $this->watts = $watts;
+        $this->battery = $battery;
 
         return $this;
     }

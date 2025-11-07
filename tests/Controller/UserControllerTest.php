@@ -48,7 +48,6 @@ final class UserControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
 
         $this->client->submitForm('Save', [
-            'user[uuid]' => 'Testing',
             'user[roles]' => 'Testing',
             'user[password]' => 'Testing',
         ]);
@@ -62,7 +61,6 @@ final class UserControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new User();
-        $fixture->setUuid('My Title');
         $fixture->setRoles('My Title');
         $fixture->setPassword('My Title');
 
@@ -81,7 +79,6 @@ final class UserControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new User();
-        $fixture->setUuid('Value');
         $fixture->setRoles('Value');
         $fixture->setPassword('Value');
 
@@ -91,7 +88,6 @@ final class UserControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
 
         $this->client->submitForm('Update', [
-            'user[uuid]' => 'Something New',
             'user[roles]' => 'Something New',
             'user[password]' => 'Something New',
         ]);
@@ -100,7 +96,6 @@ final class UserControllerTest extends WebTestCase
 
         $fixture = $this->userRepository->findAll();
 
-        self::assertSame('Something New', $fixture[0]->getUuid());
         self::assertSame('Something New', $fixture[0]->getRoles());
         self::assertSame('Something New', $fixture[0]->getPassword());
     }
@@ -109,7 +104,6 @@ final class UserControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new User();
-        $fixture->setUuid('Value');
         $fixture->setRoles('Value');
         $fixture->setPassword('Value');
 

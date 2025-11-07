@@ -32,6 +32,5 @@ final class Version20251104024700 extends AbstractMigration
         , password VARCHAR(255) NOT NULL)');
         $this->addSql('INSERT INTO "user" (id, uuid, roles, password) SELECT id, uuid, roles, password FROM __temp__user');
         $this->addSql('DROP TABLE __temp__user');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_IDENTIFIER_UUID ON "user" (uuid)');
     }
 }

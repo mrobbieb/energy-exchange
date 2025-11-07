@@ -48,7 +48,6 @@ final class ExchangeControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
 
         $this->client->submitForm('Save', [
-            'exchange[uuid]' => 'Testing',
             'exchange[userId]' => 'Testing',
             'exchange[batteryId]' => 'Testing',
             'exchange[createdAt]' => 'Testing',
@@ -65,7 +64,6 @@ final class ExchangeControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new Exchange();
-        $fixture->setUuid('My Title');
         $fixture->setUserId('My Title');
         $fixture->setBatteryId('My Title');
         $fixture->setCreatedAt('My Title');
@@ -87,7 +85,6 @@ final class ExchangeControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new Exchange();
-        $fixture->setUuid('Value');
         $fixture->setUserId('Value');
         $fixture->setBatteryId('Value');
         $fixture->setCreatedAt('Value');
@@ -100,7 +97,6 @@ final class ExchangeControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
 
         $this->client->submitForm('Update', [
-            'exchange[uuid]' => 'Something New',
             'exchange[userId]' => 'Something New',
             'exchange[batteryId]' => 'Something New',
             'exchange[createdAt]' => 'Something New',
@@ -112,7 +108,6 @@ final class ExchangeControllerTest extends WebTestCase
 
         $fixture = $this->exchangeRepository->findAll();
 
-        self::assertSame('Something New', $fixture[0]->getUuid());
         self::assertSame('Something New', $fixture[0]->getUserId());
         self::assertSame('Something New', $fixture[0]->getBatteryId());
         self::assertSame('Something New', $fixture[0]->getCreatedAt());
@@ -124,7 +119,6 @@ final class ExchangeControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new Exchange();
-        $fixture->setUuid('Value');
         $fixture->setUserId('Value');
         $fixture->setBatteryId('Value');
         $fixture->setCreatedAt('Value');

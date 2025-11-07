@@ -12,7 +12,6 @@ class ExchangeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('uuid')
             ->add('userId')
             ->add('batteryId')
             ->add('createdAt', null, [

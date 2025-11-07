@@ -9,7 +9,6 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Uuid</th>
                 <th>CreatedAt</th>
                 <th>UpdatedAt</th>
                 <th>Description</th>
@@ -20,7 +19,6 @@
         {% for battery_bank in battery_banks %}
             <tr>
                 <td>{{ battery_bank.id }}</td>
-                <td>{{ battery_bank.uuid }}</td>
                 <td>{{ battery_bank.createdAt ? battery_bank.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ battery_bank.updatedAt ? battery_bank.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ battery_bank.description }}</td>

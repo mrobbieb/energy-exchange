@@ -48,7 +48,6 @@ final class BatteryBankControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
 
         $this->client->submitForm('Save', [
-            'battery_bank[uuid]' => 'Testing',
             'battery_bank[createdAt]' => 'Testing',
             'battery_bank[updatedAt]' => 'Testing',
             'battery_bank[description]' => 'Testing',
@@ -63,7 +62,6 @@ final class BatteryBankControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new BatteryBank();
-        $fixture->setUuid('My Title');
         $fixture->setCreatedAt('My Title');
         $fixture->setUpdatedAt('My Title');
         $fixture->setDescription('My Title');
@@ -83,7 +81,6 @@ final class BatteryBankControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new BatteryBank();
-        $fixture->setUuid('Value');
         $fixture->setCreatedAt('Value');
         $fixture->setUpdatedAt('Value');
         $fixture->setDescription('Value');
@@ -94,7 +91,6 @@ final class BatteryBankControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
 
         $this->client->submitForm('Update', [
-            'battery_bank[uuid]' => 'Something New',
             'battery_bank[createdAt]' => 'Something New',
             'battery_bank[updatedAt]' => 'Something New',
             'battery_bank[description]' => 'Something New',
@@ -104,7 +100,6 @@ final class BatteryBankControllerTest extends WebTestCase
 
         $fixture = $this->batteryBankRepository->findAll();
 
-        self::assertSame('Something New', $fixture[0]->getUuid());
         self::assertSame('Something New', $fixture[0]->getCreatedAt());
         self::assertSame('Something New', $fixture[0]->getUpdatedAt());
         self::assertSame('Something New', $fixture[0]->getDescription());
@@ -114,7 +109,6 @@ final class BatteryBankControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new BatteryBank();
-        $fixture->setUuid('Value');
         $fixture->setCreatedAt('Value');
         $fixture->setUpdatedAt('Value');
         $fixture->setDescription('Value');
