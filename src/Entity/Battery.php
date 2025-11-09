@@ -22,9 +22,6 @@ class Battery
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $batteryBankId = null;
-
-    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'batteries')]
@@ -72,18 +69,6 @@ class Battery
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getBatteryBankId(): ?int
-    {
-        return $this->batteryBankId;
-    }
-
-    public function setBatteryBankId(?int $batteryBankId): static
-    {
-        $this->batteryBankId = $batteryBankId;
 
         return $this;
     }

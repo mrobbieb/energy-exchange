@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Battery;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,11 +15,16 @@ class BatteryType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('userId')
+            ->add('user', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'id',
+                'placeholder' => 'Choose a User'
+                
+            ])
             ->add('createdAt', null, [
                 'widget' => 'single_text',
             ])
-            ->add('batteryBankId')
+            ->add('batteryBank')
             ->add('updatedAt', null, [
                 'widget' => 'single_text',
             ])

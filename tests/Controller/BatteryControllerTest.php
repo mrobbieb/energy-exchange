@@ -49,7 +49,7 @@ final class BatteryControllerTest extends WebTestCase
 
         $this->client->submitForm('Save', [
             'battery[name]' => 'Testing',
-            'battery[userId]' => 'Testing',
+            'battery[user.id]' => 'Testing',
             'battery[createdAt]' => 'Testing',
             'battery[batteryBankId]' => 'Testing',
             'battery[updatedAt]' => 'Testing',
