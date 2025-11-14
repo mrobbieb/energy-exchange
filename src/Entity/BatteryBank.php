@@ -44,8 +44,11 @@ class BatteryBank
     #[ORM\OneToMany(targetEntity: Battery::class, mappedBy: 'BatteryBank')]
     private Collection $batteries;
 
-    #[ORM\OneToOne(mappedBy: 'batteryBank', cascade: ['persist', 'remove'])]
-    private ?EnergyTransaction $energyTransaction = null;
+    /**
+     * @var Collection<int, EnergyTransaction>
+     */
+    #[ORM\OneToMany(targetEntity: EnergyTransaction::class, mappedBy: 'batteryBank', orphanRemoval: true)]
+    private Collection $energyTransactions;
 
     public function __construct()
     {
@@ -123,24 +126,32 @@ class BatteryBank
         return $this;
     }
 
-    public function getEnergyTransaction(): ?EnergyTransaction
+/**
+     * @return Collection<int, EnergyTransaction>
+     */
+    public function getEnergyTransactions(): Collection
     {
-        return $this->energyTransaction;
+        return $this->energyTransactions;
     }
 
-    public function setEnergyTransaction(?EnergyTransaction $energyTransaction): static
+    public function addEnergyTransaction(EnergyTransaction $energyTransaction): static
     {
-        // unset the owning side of the relation if necessary
-        if ($energyTransaction === null && $this->energyTransaction !== null) {
-            $this->energyTransaction->setBatteryBank(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($energyTransaction !== null && $energyTransaction->getBatteryBank() !== $this) {
+        if (!$this->energyTransactions->contains($energyTransaction)) {
+            $this->energyTransactions->add($energyTransaction);
             $energyTransaction->setBatteryBank($this);
         }
 
-        $this->energyTransaction = $energyTransaction;
+        return $this;
+    }
+
+    public function removeEnergyTransaction(EnergyTransaction $energyTransaction): static
+    {
+        if ($this->energyTransactions->removeElement($energyTransaction)) {
+            // set the owning side to null (unless already changed)
+            if ($energyTransaction->getBatteryBank() === $this) {
+                $energyTransaction->setBatteryBank(null);
+            }
+        }
 
         return $this;
     }

@@ -51,10 +51,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Battery::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $batteries;
 
+    /**
+     * @var Collection<int, EnergyTransaction>
+     */
+    #[ORM\OneToMany(targetEntity: EnergyTransaction::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $energyTransactions;
+
     public function __construct()
     {
         $this->batteryBanks = new ArrayCollection();
         $this->batteries = new ArrayCollection();
+        $this->energyTransactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -192,6 +199,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($battery->getUser() === $this) {
                 $battery->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return Collection<int, EnergyTransaction>
+     */
+    public function getEnergyTransactions(): Collection
+    {
+        return $this->energyTransactions;
+    }
+
+    public function addEnergyTransaction(EnergyTransaction $energyTransaction): static
+    {
+        if (!$this->energyTransactions->contains($energyTransaction)) {
+            $this->energyTransactions->add($energyTransaction);
+            $energyTransaction->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEnergyTransaction(EnergyTransaction $energyTransaction): static
+    {
+        if ($this->energyTransactions->removeElement($energyTransaction)) {
+            // set the owning side to null (unless already changed)
+            if ($energyTransaction->getUser() === $this) {
+                $energyTransaction->setUser(null);
             }
         }
 

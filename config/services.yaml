@@ -16,5 +16,20 @@ services:
     App\:
         resource: '../src/'
 
+    App\Serializer\Denormalizer\BatteryDenormalizer:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags: ['serializer.normalizer']
+
+    App\Serializer\Denormalizer\BatteryBankDenormalizer:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags: ['serializer.normalizer']
+
+    App\Serializer\Denormalizer\UserDenormalizer:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags: ['serializer.normalizer']
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

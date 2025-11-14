@@ -19,21 +19,21 @@ class EnergyTransaction
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     private ?int $watts = null;
 
-    #[ORM\OneToOne(inversedBy: 'energyTransaction', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'energyTransaction')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Battery $battery = null;
 
-    #[ORM\OneToOne(inversedBy: 'energyTransaction', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'energyTransaction')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\OneToOne(inversedBy: 'energyTransaction', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'energyTransaction')]
     private ?BatteryBank $batteryBank = null;
 
     public function getId(): ?int

@@ -5,6 +5,9 @@ namespace App\Entity;
 use App\Repository\BatteryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BatteryRepository::class)]
 #[Broadcast]
@@ -13,6 +16,7 @@ class Battery
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['energyTransaction:read', 'batteryBank:read', 'battery:detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -30,12 +34,15 @@ class Battery
     #[ORM\OneToOne(mappedBy: 'battery', cascade: ['persist', 'remove'])]
     private ?PowerSource $powerSource = null;
 
-    #[ORM\OneToOne(mappedBy: 'battery', cascade: ['persist', 'remove'])]
-    private ?EnergyTransaction $energyTransaction = null;
-
     #[ORM\ManyToOne(inversedBy: 'batteries')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    /**
+     * @var Collection<int, EnergyTransaction>
+     */
+    #[ORM\OneToMany(targetEntity: EnergyTransaction::class, mappedBy: 'battery', orphanRemoval: true)]
+    private Collection $energyTransactions;
 
     public function getId(): ?int
     {
@@ -119,19 +126,32 @@ class Battery
         return $this;
     }
 
-    public function getEnergyTransaction(): ?EnergyTransaction
+    /**
+     * @return Collection<int, EnergyTransaction>
+     */
+    public function getEnergyTransactions(): Collection
     {
-        return $this->energyTransaction;
+        return $this->energyTransactions;
     }
 
-    public function setEnergyTransaction(EnergyTransaction $energyTransaction): static
+    public function addEnergyTransaction(EnergyTransaction $energyTransaction): static
     {
-        // set the owning side of the relation if necessary
-        if ($energyTransaction->getBattery() !== $this) {
+        if (!$this->energyTransactions->contains($energyTransaction)) {
+            $this->energyTransactions->add($energyTransaction);
             $energyTransaction->setBattery($this);
         }
 
-        $this->energyTransaction = $energyTransaction;
+        return $this;
+    }
+
+    public function removeEnergyTransaction(EnergyTransaction $energyTransaction): static
+    {
+        if ($this->energyTransactions->removeElement($energyTransaction)) {
+            // set the owning side to null (unless already changed)
+            if ($energyTransaction->getBattery() === $this) {
+                $energyTransaction->setBattery(null);
+            }
+        }
 
         return $this;
     }
