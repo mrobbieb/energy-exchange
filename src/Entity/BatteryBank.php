@@ -8,10 +8,28 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
+use App\Entity\User;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: BatteryBankRepository::class)]
 #[Broadcast]
-
+#[ApiResource(
+    normalizationContext: ['groups' => ['batteryBank:read']],
+    denormalizationContext: ['groups' => ['batteryBank:write']],
+    paginationEnabled: true,
+    paginationItemsPerPage: 10,
+    paginationClientItemsPerPage: true,
+)]
+#[ApiFilter(SearchFilter::class, 
+    properties: [
+        'user.id' => 'exact',
+        'battery.id' => 'exact'
+    ]
+)]
 /**
  * A clean definition of a battery bank would be multiple batteries,
  *  but in our case we will allow for a single battery to make up a
@@ -27,21 +45,27 @@ class BatteryBank
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['batteryBank:read', 'energyTransaction:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['batteryBank:read', 'energyTransaction:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['batteryBank:read', 'energyTransaction:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['batteryBank:read', 'energyTransaction:read'])]
     private ?string $description = null;
 
     /**
      * @var Collection<int, Battery>
      */
     #[ORM\OneToMany(targetEntity: Battery::class, mappedBy: 'BatteryBank')]
+    #[Groups(['battery:read', 'batteryBank:read'])] // <-- IMPORTANT: remove 'energyTransaction:read' here
+    #[MaxDepth(1)]  
     private Collection $batteries;
 
     /**

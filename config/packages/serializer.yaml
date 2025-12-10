@@ -1,0 +1,12 @@
+# config/packages/serializer.yaml
+framework:
+  serializer:
+    enabled: true
+    enable_attributes: true
+
+    # Global options that apply to all serialization
+    default_context:
+      enable_max_depth: true
+
+    # Optional global circular reference handler
+    circular_reference_handler: 'App\Serializer\CircularReferenceHandler'

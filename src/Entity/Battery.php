@@ -8,40 +8,66 @@ use Symfony\UX\Turbo\Attribute\Broadcast;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: BatteryRepository::class)]
 #[Broadcast]
+#[ApiResource(
+    normalizationContext: ['groups' => ['battery:read']],
+    denormalizationContext: ['groups' => ['battery:write']],
+    paginationEnabled: true,
+    paginationItemsPerPage: 10,
+    paginationClientItemsPerPage: true,
+    forceEager: false,
+)]
+#[ApiFilter(SearchFilter::class, 
+    properties: [
+        'user.id' => 'exact'
+    ]
+)]
 class Battery
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['energyTransaction:read', 'batteryBank:read', 'battery:detail'])]
+    //#[Groups(['energyTransaction:read', 'batteryBank:read', 'battery:read'])]
+    #[Groups(['battery:read', 'batteryBank:read', 'battery:write', 'energyTransaction:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['battery:read', 'battery:write'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(['battery:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['battery:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'batteries')]
+    #[Groups(['battery:read'])]
     private ?BatteryBank $BatteryBank = null;
 
     #[ORM\OneToOne(mappedBy: 'battery', cascade: ['persist', 'remove'])]
+    #[Groups(['battery:read'])]
     private ?PowerSource $powerSource = null;
 
     #[ORM\ManyToOne(inversedBy: 'batteries')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['battery:read', 'battery:write'])]
     private ?User $user = null;
 
     /**
      * @var Collection<int, EnergyTransaction>
      */
-    #[ORM\OneToMany(targetEntity: EnergyTransaction::class, mappedBy: 'battery', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'battery', targetEntity: EnergyTransaction::class)]
+    //#[Groups(['battery:read'])] // <-- IMPORTANT: remove 'energyTransaction:read' here
+    #[MaxDepth(1)]               // optional extra safety
     private Collection $energyTransactions;
 
     public function getId(): ?int
@@ -129,6 +155,7 @@ class Battery
     /**
      * @return Collection<int, EnergyTransaction>
      */
+    
     public function getEnergyTransactions(): Collection
     {
         return $this->energyTransactions;

@@ -20,11 +20,12 @@ use App\DTO\EnergyTransactionDTO;
 use App\Repository\UserRepository;
 use DateTime;
 use DateTimeImmutable;
+use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
 
 #[Route('/transaction')]
 final class EnergyTransactionController extends AbstractController
 {
-    #[Route('/energy/transaction', name: 'app_energy_transaction')]
+    #[Route(name: 'app_energy_transaction')]
     public function index(): Response
     {
         return $this->render('energy_transaction/index.html.twig', [
@@ -32,7 +33,7 @@ final class EnergyTransactionController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_energy_transaction_new', methods: ['GET', 'POST'])]
+    #[Route('', name: 'app_energy_transaction_new', methods: ['GET', 'POST'])]
     public function new(Request $request,
     EnergyTransactionRepository $energyTransactionRepository,
     BatteryRepository $batteryRepository,
@@ -98,9 +99,27 @@ final class EnergyTransactionController extends AbstractController
         );
     }
 
-    #[Route('/{id}', name: 'app_exchange_show', methods: ['GET'])]
-    public function show(Exchange $exchange): JsonResponse
+    #[Route('/{id}', name: 'app_energy_transaction_show', methods: ['GET'])]
+    public function show(int $id, Request $request, EnergyTransactionRepository $energyTransactionRepository, SerializerInterface $serializer): JsonResponse
     {
-        //json
+        $energyTransaction = $energyTransactionRepository->find($id);
+
+        // $data = [
+        //     'transactionId' => $energyTransaction->getId(),
+        //     'batteryId' => $energyTransaction->getBattery()->getId(),
+        //     'batteryBankId' => $energyTransaction->getBatteryBank()->getId(),
+        //     'userId' => $energyTransaction->getUser()->getId(),
+        //     'watts' => $energyTransaction->getWatts(),
+        //     'createdAt' => $energyTransaction->getCreatedAt()
+        // ];
+
+        // $serializedTransaction = $serializer->serialize($data,'json');
+        $context = (new ObjectNormalizerContextBuilder())
+            ->withGroups('energyTransaction:read')
+            ->toArray();
+
+        $serializedTransaction = $serializer->serialize($energyTransaction,'json', $context);
+
+        return new JsonResponse($serializedTransaction, JsonResponse::HTTP_OK, [], true);
     }
 }
