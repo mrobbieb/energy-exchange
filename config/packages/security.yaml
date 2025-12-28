@@ -1,33 +1,43 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
-    providers:
-        # used to reload user from session & other features (e.g. switch_user)
-        app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: id
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            lazy: true
-            provider: app_user_provider
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+    App\Entity\User: 'auto'
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Entity\User
+        property: email
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+    # ✅ API FIRST so it always matches /api before main
+    api:
+      pattern: ^/api
+      provider: app_user_provider
+      stateless: true        # you can keep this true once session usage is gone
+      jwt: ~
+
+    # ✅ everything else (forms, /user/new, etc)
+    main:
+      lazy: true
+      provider: app_user_provider
+      json_login:
+        check_path: /auth
+        username_path: email
+        password_path: password
+        success_handler: lexik_jwt_authentication.handler.authentication_success
+        failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+  access_control:
+    - { path: ^/auth$, roles: PUBLIC_ACCESS }
+    - { path: ^/docs, roles: PUBLIC_ACCESS }
+    - { path: ^/contexts, roles: PUBLIC_ACCESS }
+    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
 
 when@test:
     security:
