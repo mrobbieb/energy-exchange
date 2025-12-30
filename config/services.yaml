@@ -15,6 +15,8 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+        autowire: true
+        autoconfigure: true
 
     App\Serializer\Denormalizer\BatteryDenormalizer:
         arguments:

@@ -77,6 +77,7 @@ class BatteryBank
     public function __construct()
     {
         $this->batteries = new ArrayCollection();
+        $this->energyTransactions = new ArrayCollection();
     }
 
     public function getId(): ?int

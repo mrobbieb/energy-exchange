@@ -70,6 +70,11 @@ class Battery
     #[MaxDepth(1)]               // optional extra safety
     private Collection $energyTransactions;
 
+    public function __construct()
+    {
+        $this->energyTransactions = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
