@@ -1,0 +1,24 @@
+# config/packages/ai.yaml
+ai:
+  platform:
+    openai:
+      api_key: '%env(OPENAI_API_KEY)%'
+
+  agent:
+    default:
+      model: 'gpt-4o-mini'
+
+  vectorizer:
+    openai_small:
+      platform: 'ai.platform.openai'
+      model:
+        name: 'text-embedding-3-small'
+
+  retriever:
+    policies:
+      vectorizer: 'ai.vectorizer.openai_small'
+      store: 'ai.store.postgres.default'
+
+  # Optional but recommended: name your embedding model/vectorizer
+  # (Symfony docs show using text-embedding-3-small for embeddings.)
+  # See also the RAG cookbook for Vectorizer usage.

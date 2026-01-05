@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  php-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_ENV: test
+      APP_DEBUG: 0
+      DEFAULT_URI: http://localhost
+      DATABASE_URL: "sqlite:///%kernel.project_dir%/var/app_test.db"
+
+      JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
+      JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer:v2
+          coverage: none
+          extensions: mbstring, intl, pdo_sqlite
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer/cache/files
+            vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      # Ensure var/ exists and is writable
+      - name: Prepare var directory
+        run: |
+          mkdir -p var
+          chmod -R 777 var
+
+      # Generate JWT keys (needed for /auth in tests)
+      - name: Generate JWT keypair
+        run: |
+          php bin/console lexik:jwt:generate-keypair --overwrite --env=test
+
+      # Build schema for test DB
+      - name: Prepare database
+        run: |
+          php bin/console doctrine:database:create --if-not-exists --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit

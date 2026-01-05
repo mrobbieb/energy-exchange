@@ -33,5 +33,37 @@ services:
             $entityManager: '@doctrine.orm.entity_manager'
         tags: ['serializer.normalizer']
 
+    App\Command\AiIndexPoliciesCommand:
+        arguments:
+            $store: '@ai.store.postgres.default'
+            $platform: '@ai.traceable_platform.openai'
+
+    App\AI\PoliciesRag:
+        arguments:
+            $policiesRetriever: '@ai.retriever.policies'
+            $agent: '@ai.agent.default'
+
+    app.policy_retriever:
+        class: App\AI\PolicyRetriever
+        arguments:
+            $platform: '@ai.traceable_platform.openai'
+            $store: '@ai.store.postgres.default'
+        public: true
+
+    # ai.vectorizer.policies:
+    #     class: Symfony\AI\Store\Document\Vectorizer
+    #     arguments:
+    #         $platform: '@ai.traceable_platform.openai'
+    #         $model: 'text-embedding-3-small'
+    #     public: true
+
+    # ai.store_retriever.policies:
+    #     class: Symfony\AI\Store\Retriever
+    #     arguments:
+    #         $vectorizer: '@ai.vectorizer.policies'
+    #         $store: '@ai.store.postgres.default'
+    #     tags: ['ai.store.retriever']
+    #     public: true
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
