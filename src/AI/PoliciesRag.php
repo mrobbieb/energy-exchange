@@ -12,7 +12,7 @@ use Symfony\AI\Store\Document\Metadata;
 final class PoliciesRag
 {
     public function __construct(
-        private readonly Retriever $policiesRetriever,
+        private readonly PolicyRetriever $policiesRetriever,
         private readonly AgentInterface $agent,
     ) {}
 
@@ -32,8 +32,9 @@ final class PoliciesRag
      * @return array{answer:string, citations:array<int,array{doc:string,section:string,score:float|null}>, sourcesUsed:int}
      */
     public function answer(string $question, int $k = 6): array
-    {
-        $hits = $this->policiesRetriever->retrieve($question, ['limit' => $k]);
+    {   
+        $hits = $this->policiesRetriever->retrievePolicies($question, $k);
+        // $hits = $this->policiesRetriever->retrieve($question, ['limit' => $k, 'filters' => ['type' => 'policy', 'corpus' => 'policies']]);
 
         $sourcesText = '';
         $citations = [];
@@ -63,8 +64,13 @@ final class PoliciesRag
 
             // IMPORTANT:
             // VectorDocument does NOT include content. We rely on indexing copying chunk text into metadata['chunk'].
-            $content  = $metadata ? ($metadata['chunk'] ?? '') : '';
+            //$content  = $metadata ? ($metadata['chunk'] ?? '') : '';
+            $content = $this->getVectorDocProp($hit, 'content')
+                ?? $this->getVectorDocProp($hit, 'text')
+                ?? ($metadata ? ($metadata['chunk'] ?? '') : '');
 
+            $content = is_string($content) ? $content : '';
+            
             if (trim($content) === '') {
                 // Skip empty sources so we don't feed blank context to the model
                 continue;
@@ -119,7 +125,8 @@ final class PoliciesRag
                 "   - Cite the MINIMUM number of sources needed.\n".
                 "   - Prefer the most directly relevant sources (definitions and handling rules first).\n".
                 "   - Output citations as: 'Citations: Source X, Source Y' at the end.\n".
-                "5) After each paragraph that states a rule, add inline citations like (Source 2).\n"
+                "5) After each paragraph that states a rule, add inline citations like (Source 2).\n".
+                "6) Use only the Source numbers exactly as provided in the Sources block; do not invent Source numbers.\n"
             ),
             Message::ofUser("Question:\n{$question}\n\nSources:\n{$sourcesText}\n")
         );
@@ -195,6 +202,7 @@ final class PoliciesRag
             $sourcesText .= "\n\n[Source {$i}: {$src['doc']} — {$src['section']}]\n";
             $sourcesText .= $src['content'];
         }
+        $this->agent->call($messages);
 
         $sourceMap = [];
         foreach ($providedSources as $idx => $c) {
@@ -202,6 +210,7 @@ final class PoliciesRag
                 'source' => $idx + 1,
                 'doc' => $c['doc'],
                 'section' => $c['section'],
+                'chunk_index' => $c['chunk_index'],
             ];
         }
 

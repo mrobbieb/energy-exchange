@@ -35,13 +35,38 @@ services:
 
     App\Command\AiIndexPoliciesCommand:
         arguments:
-            $store: '@ai.store.postgres.default'
-            $platform: '@ai.traceable_platform.openai'
+            $platform: '@?ai.traceable_platform.openai'
+            $store: '@?ai.store.postgres.default'
+
+    App\Command\AiIndexEngineeringCommand:
+        arguments:
+            $platform: '@?ai.traceable_platform.openai'
+            $store: '@?ai.store.postgres.default'
+
+    App\AI\EngineeringRetriever:
+        arguments:
+            $platform: '@?ai.traceable_platform.openai'
+            $store: '@?ai.store.postgres.default'
+
+    App\AI\PolicyRetriever:
+        arguments:
+            $platform: '@?ai.traceable_platform.openai'
+            $store: '@?ai.store.postgres.default'
 
     App\AI\PoliciesRag:
         arguments:
-            $policiesRetriever: '@ai.retriever.policies'
-            $agent: '@ai.agent.default'
+            $policiesRetriever: '@App\AI\PolicyRetriever'
+            #$agent: '@ai.agent.default'
+
+    App\AI\Rag\QuestionRouter: ~
+    App\AI\Rag\PromptBuilder: ~
+    App\AI\Rag\RetrievalPlan: ~
+    App\AI\Rag\FilteredRetriever:
+        arguments:
+            $retriever: '@ai.retriever.policies' # adjust to your service id
+    App\AI\Rag\RagOrchestrator:
+        arguments:
+            $agent: '@ai.agent.default' # adjust
 
     app.policy_retriever:
         class: App\AI\PolicyRetriever

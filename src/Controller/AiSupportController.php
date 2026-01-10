@@ -7,11 +7,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use App\AI\EngineeringRag;
+use App\AI\QuestionRouter;
 
 final class AiSupportController extends AbstractController
 {
     public function __construct(
         private readonly PoliciesRag $rag,
+        private readonly EngineeringRag $engineeringRag,
+        private readonly QuestionRouter $router,
     ) {}
 
     #[Route('/ai/support', name: 'ai_support', methods: ['POST'])]
@@ -24,14 +28,15 @@ final class AiSupportController extends AbstractController
             return $this->json(['error' => 'Missing question'], 400);
         }
 
-        $out = $this->rag->answer($question, 6);
+        $route = $this->router->route($question);
 
-        // return $this->json([
-        //     'answer' => $out['answer'],
-        //     'citations' => $out['citations'],
-        //     'sourcesUsed' => $out['sourcesUsed'],
-        // ]);
+        $out = match ($route) {
+            'engineering' => $this->engineeringRag->answer($question, 6),
+            default => $this->rag->answer($question, 6),
+        };
+
         return $this->json([
+            'domain' => $route,
             'answer' => $out['answer'],
             'citations' => $out['citations'],
             'sourceMap' => $out['sourceMap'] ?? [],
