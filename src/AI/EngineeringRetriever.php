@@ -15,8 +15,10 @@ final class EngineeringRetriever
         PlatformInterface $platform,
         StoreInterface $store,
     ) {
-        $vectorizer = new Vectorizer($platform, 'text-embedding-3-small');
-        $this->retriever = new Retriever($vectorizer, $store);
+        if ($platform && $store) {
+            $vectorizer = new Vectorizer($platform, 'text-embedding-3-small');
+            $this->retriever = new Retriever($vectorizer, $store);
+        }
     }
 
     public function retrieveEngineering(string $question, int $k = 6): iterable

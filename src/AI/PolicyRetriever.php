@@ -15,9 +15,11 @@ final class PolicyRetriever
         PlatformInterface $platform,
         StoreInterface $store,
     ) {
-        // Same pattern as the docs: Retriever(vectorizer, store) :contentReference[oaicite:1]{index=1}
-        $vectorizer = new Vectorizer($platform, 'text-embedding-3-small');
-        $this->retriever = new Retriever($vectorizer, $store);
+        if ($platform && $store) {
+            // Same pattern as the docs: Retriever(vectorizer, store) :contentReference[oaicite:1]{index=1}
+            $vectorizer = new Vectorizer($platform, 'text-embedding-3-small');
+            $this->retriever = new Retriever($vectorizer, $store);
+        }
     }
 
     public function retrieve(string $question, int $k = 6): iterable
