@@ -63,7 +63,7 @@ final class AiIndexPoliciesCommand extends Command
                 $chunkPreview = mb_substr(trim(strtok($chunkText, "\n")), 0, 120);
 
                 $docs[] = new TextDocument(
-                    id: Uuid::v4()->toRfc4122(),
+                    id: Uuid::v4(),
                     content: $chunkText,
                     metadata: new Metadata([
                         'type' => 'policy',
