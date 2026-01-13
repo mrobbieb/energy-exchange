@@ -16,10 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Uid\Uuid;
 
 
-#[AsCommand(
-    name: 'ai:index:engineering',
-    description: 'Embed and index engineering markdown docs into the vector store'
-)]
+#[AsCommand(name: 'ai:index:engineering', description: 'Indexes engineering markdown files into the AI vector store.')]
 final class AiIndexEngineeringCommand extends Command
 {
     public function __construct(
@@ -32,8 +29,8 @@ final class AiIndexEngineeringCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if ($this->platform || $this->store) {
-            $output->writeln('<error>No policy .md files found in resources/policies</error>');
+        if (!$this->platform || $this->store) {
+            $output->writeln('<error>AI platform or store not configured</error>');
             return Command::FAILURE;
         }
         
@@ -59,7 +56,6 @@ final class AiIndexEngineeringCommand extends Command
 
             foreach ($chunks as $chunkIndex => $chunk) {
                 $chunkText = trim((string)($chunk['text'] ?? ''));
-
                 if ($chunkText === '') {
                     continue;
                 }
@@ -70,13 +66,13 @@ final class AiIndexEngineeringCommand extends Command
                     id: Uuid::v4(),
                     content: $chunkText,
                     metadata: new Metadata([
-                        'type' => 'policy',
-                        'corpus' => 'policies',
+                        'type' => 'engineering',
+                        'corpus' => 'engineering',
                         'doc_title' => $docTitle,
                         'section' => $chunk['section'] ?? null,
                         'chunk_index' => $chunkIndex,
                         'chunk_preview' => $chunkPreview,
-                        'chunk' => $chunkText, 
+                        'chunk' => $chunkText,   // <-- important for your current DB setup
                         'path' => $path,
                     ]),
                 );
