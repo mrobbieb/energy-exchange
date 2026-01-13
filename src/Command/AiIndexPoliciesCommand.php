@@ -54,26 +54,24 @@ final class AiIndexPoliciesCommand extends Command
             $chunks = $this->chunkMarkdownByHeadings($content);
 
             foreach ($chunks as $chunkIndex => $chunk) {
-                $chunkText = $chunk['text'] ?? '';
-                $chunkPreview = mb_substr(trim(strtok($chunkText, "\n")), 0, 120);
-                
                 $chunkText = trim((string)($chunk['text'] ?? ''));
-                
-                if ($chunkText === '') { 
-                    continue; 
+
+                if ($chunkText === '') {
+                    continue;
                 }
 
+                $chunkPreview = mb_substr(trim(strtok($chunkText, "\n")), 0, 120);
+
                 $docs[] = new TextDocument(
-                    id: Uuid::v4(),
+                    id: Uuid::v4()->toRfc4122(),
                     content: $chunkText,
                     metadata: new Metadata([
                         'type' => 'policy',
                         'corpus' => 'policies',
                         'doc_title' => $docTitle,
                         'section' => $chunk['section'] ?? null,
-                        'chunk_index' => $chunkIndex,          // stable identifier
+                        'chunk_index' => $chunkIndex,
                         'chunk_preview' => $chunkPreview,
-                        'chunk' => $chunk['text'],
                         'path' => $path,
                     ]),
                 );
