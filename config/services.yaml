@@ -35,23 +35,23 @@ services:
 
     App\Command\AiIndexPoliciesCommand:
         arguments:
-            $platform: '@?ai.traceable_platform.openai'
-            $store: '@?ai.store.postgres.default'
+            $platform: '@ai.platform.openai'
+            $store: '@ai.store.postgres.default'
 
     App\Command\AiIndexEngineeringCommand:
         arguments:
-            $platform: '@?ai.traceable_platform.openai'
-            $store: '@?ai.store.postgres.default'
+            $platform: '@ai.platform.openai'
+            $store: '@ai.store.postgres.default'
 
     App\AI\EngineeringRetriever:
         arguments:
-            $platform: '@?ai.traceable_platform.openai'
-            $store: '@?ai.store.postgres.default'
+            $platform: '@ai.platform.openai'
+            $store: '@ai.store.postgres.default'
 
     App\AI\PolicyRetriever:
         arguments:
-            $platform: '@?ai.traceable_platform.openai'
-            $store: '@?ai.store.postgres.default'
+            $platform: '@ai.platform.openai'
+            $store: '@ai.store.postgres.default'
 
     App\AI\PoliciesRag:
         arguments:
@@ -71,8 +71,8 @@ services:
     app.policy_retriever:
         class: App\AI\PolicyRetriever
         arguments:
-            $platform: '@?ai.traceable_platform.openai'
-            $store: '@?ai.store.postgres.default'
+            $platform: '@ai.platform.openai'
+            $store: '@ai.store.postgres.default'
         public: true
 
     # ai.vectorizer.policies:
