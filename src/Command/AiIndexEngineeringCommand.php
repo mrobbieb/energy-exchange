@@ -29,7 +29,7 @@ final class AiIndexEngineeringCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$this->platform || $this->store) {
+        if (!$this->platform || !$this->store) {
             $output->writeln('<error>AI platform or store not configured</error>');
             return Command::FAILURE;
         }
