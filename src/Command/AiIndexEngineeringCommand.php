@@ -46,26 +46,37 @@ final class AiIndexEngineeringCommand extends Command
         $docs = [];
 
         foreach ($paths as $path) {
-            $content = file_get_contents($path) ?: '';
+            //$content = file_get_contents($path) ?: '';
+            $content = file_get_contents($path);
+            if ($content === false) {
+                $output->writeln("<comment>Skipping unreadable file: $path</comment>");
+                continue;
+            }
             $docTitle = preg_replace('/\.md$/', '', basename($path));
 
+            // v1 chunking: split on markdown headings so retrieval is precise.
             $chunks = $this->chunkMarkdownByHeadings($content);
 
             foreach ($chunks as $chunkIndex => $chunk) {
-                $chunkText = $chunk['text'] ?? '';
+                $chunkText = trim((string)($chunk['text'] ?? ''));
+
+                if ($chunkText === '') {
+                    continue;
+                }
+
                 $chunkPreview = mb_substr(trim(strtok($chunkText, "\n")), 0, 120);
 
                 $docs[] = new TextDocument(
                     id: Uuid::v4(),
                     content: $chunkText,
                     metadata: new Metadata([
-                        'type' => 'engineering',
-                        'corpus' => 'engineering',
+                        'type' => 'policy',
+                        'corpus' => 'policies',
                         'doc_title' => $docTitle,
                         'section' => $chunk['section'] ?? null,
                         'chunk_index' => $chunkIndex,
                         'chunk_preview' => $chunkPreview,
-                        'chunk' => $chunkText,
+                        'chunk' => $chunkText, 
                         'path' => $path,
                     ]),
                 );
