@@ -72,6 +72,7 @@ final class AiIndexPoliciesCommand extends Command
                         'section' => $chunk['section'] ?? null,
                         'chunk_index' => $chunkIndex,
                         'chunk_preview' => $chunkPreview,
+                        'chunk' => $chunkText, 
                         'path' => $path,
                     ]),
                 );
