@@ -30,6 +30,18 @@ final class Version20260105232039 extends AbstractMigration
          *    - If metadata can be NULL today, this makes it default to {} for new rows.
          *    - We also coalesce existing NULLs to {} (if any).
          */
+        $this->addSql('CREATE EXTENSION IF NOT EXISTS vector');
+        $this->addSql('CREATE EXTENSION IF NOT EXISTS pgcrypto');
+
+        $this->addSql(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS ai_documents (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            content TEXT NOT NULL,
+            metadata JSONB,
+            embedding VECTOR(1536)
+            )
+        SQL);
+
         $this->addSql("UPDATE ai_documents SET metadata = '{}'::jsonb WHERE metadata IS NULL");
         $this->addSql("ALTER TABLE ai_documents ALTER COLUMN metadata SET DEFAULT '{}'::jsonb");
 
@@ -69,5 +81,9 @@ final class Version20260105232039 extends AbstractMigration
 
         // Revert default (leave the data cleanup as-is; it's harmless)
         $this->addSql("ALTER TABLE ai_documents ALTER COLUMN metadata DROP DEFAULT");
+
+        $this->addSql('DROP TABLE IF EXISTS ai_documents');
+        $this->addSql('DROP EXTENSION IF EXISTS vector');
+        $this->addSql('DROP EXTENSION IF EXISTS pgcrypto');
     }
 }

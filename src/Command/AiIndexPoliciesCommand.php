@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Command;
-
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +18,8 @@ use Symfony\AI\Platform\PlatformInterface;
 #[AsCommand(name: 'app:ai:index-policies', description: 'Indexes policy markdown files into the AI vector store.')]
 final class AiIndexPoliciesCommand extends Command
 {
-    public function __construct(
+	public function __construct(
+	#[Autowire(service: 'ai.platform.openai')]
         private readonly PlatformInterface $platform,
         private readonly StoreInterface $store,     // should resolve to your postgres store
         private readonly string $policiesDir = __DIR__ . '/../../resources/policies',
@@ -28,11 +29,11 @@ final class AiIndexPoliciesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if ($this->platform || $this->store) {
+        if (!$this->platform || !$this->store) {
             $output->writeln('<error>No policy .md files found in resources/policies</error>');
             return Command::FAILURE;
         }
-        
+
         $paths = glob($this->policiesDir.'/*.md') ?: [];
         if (!$paths) {
             $output->writeln('<error>No policy .md files found in resources/policies</error>');
@@ -46,11 +47,11 @@ final class AiIndexPoliciesCommand extends Command
 
             // v1 chunking: split on markdown headings so retrieval is precise.
             $chunks = $this->chunkMarkdownByHeadings($content);
-            
+
             foreach ($chunks as $chunkIndex => $chunk) {
                 $chunkText = $chunk['text'] ?? '';
                 $chunkPreview = mb_substr(trim(strtok($chunkText, "\n")), 0, 120);
-                
+
                 $docs[] = new TextDocument(
                     id: Uuid::v4(),
                     content: $chunk['text'],
