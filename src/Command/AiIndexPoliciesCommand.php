@@ -42,7 +42,12 @@ final class AiIndexPoliciesCommand extends Command
 
         $docs = [];
         foreach ($paths as $path) {
-            $content = file_get_contents($path) ?: '';
+            //$content = file_get_contents($path) ?: '';
+            $content = file_get_contents($path);
+            if ($content === false) {
+                $output->writeln("<comment>Skipping unreadable file: $path</comment>");
+                continue;
+            }
             $docTitle = preg_replace('/\.md$/', '', basename($path));
 
             // v1 chunking: split on markdown headings so retrieval is precise.
@@ -51,10 +56,16 @@ final class AiIndexPoliciesCommand extends Command
             foreach ($chunks as $chunkIndex => $chunk) {
                 $chunkText = $chunk['text'] ?? '';
                 $chunkPreview = mb_substr(trim(strtok($chunkText, "\n")), 0, 120);
+                
+                $chunkText = trim((string)($chunk['text'] ?? ''));
+                
+                if ($chunkText === '') { 
+                    continue; 
+                }
 
                 $docs[] = new TextDocument(
                     id: Uuid::v4(),
-                    content: $chunk['text'],
+                    content: $chunkText,
                     metadata: new Metadata([
                         'type' => 'policy',
                         'corpus' => 'policies',
